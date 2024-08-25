@@ -1,23 +1,36 @@
-const AssemblyAI = require('assemblyai');
-const fs = require('fs');
+import { useTTS } from '@cartesia/cartesia-js/react';
 
-const transcription = []
+export default function TextToSpeech() {
+	const tts = useTTS({
+		apiKey: "your-api-key",
+		sampleRate: 44100,
+	})
 
-const transcribeLocalFile = async () => {
-  const client = new AssemblyAI({
-    apiKey: process.env.ASSEMBLY_AI_KEY,
-  });
+	const [text, setText] = useState("");
 
-  const file = fs.readFileSync('/phone_number_test.m4a');
-  const data = {
-    audio: file,
-  };
+	const handlePlay = async () => {
+		// Begin buffering the audio.
+		const response = await tts.buffer({
+			model_id: "sonic-english",
+			voice: {
+        		mode: "id",
+        		id: "a0e99841-438c-4a64-b679-ae501e7d6091",
+        	},
+			transcript: text,
+		});
 
-  const transcript = await client.transcripts.transcribe(data);
-  console.log('Transcription:', transcript.text);
-  transcription.push(transcript.text)
-};
+		// Immediately play the audio. (You can also buffer in advance and play later.)
+		await tts.play();
+	}
 
-transcribeLocalFile();
+	return (
+		<div>
+			<input type="text" value={text} onChange={(event) => setText(event.target.value)} />
+			<button onClick={handlePlay}>Play</button>
 
-// export transcription[0];
+			<div>
+				{tts.playbackStatus} | {tts.bufferStatus} | {tts.isWaiting}
+			</div>
+		</div>
+	);
+}
