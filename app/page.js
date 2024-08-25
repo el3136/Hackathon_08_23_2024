@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 
 export default function Home() {
-  const [transcription, setTranscription] = useState('')
+  const [transcription, setTranscription] = useState('');
 
   const [messages, setMessages] = useState([
     {
@@ -13,7 +13,7 @@ export default function Home() {
       content: "Hi! How can I help you today?",
     },
   ])
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState('');
   
   const transcibeAudioFileText = async () => {
     try {
@@ -22,15 +22,18 @@ export default function Home() {
       })
   
       if (!response.ok) {
-        throw new Error('Network response was not ok')
+        throw new Error('Network response was not ok');
       }
 
       const result = await response.json().then((data) => {
-        return data.transcription
+        return JSON.parse(data);
       }).catch(error => {
-        // Handle error
+        console.error('Error:', error);
       });
-      console.log(result)
+      console.log(result);
+      console.log(result.transcription);
+
+      setTranscription(result.transcription);
 
     } catch (error) {
       console.error('Error:', error)
@@ -92,8 +95,18 @@ export default function Home() {
         p={2}
         spacing={3}
       >
-        <Button onClick={transcibeAudioFileText}>Transcribe</Button>
-        <Box>Transcription : {transcription}</Box>
+        <Stack
+          direction={'column'}
+          spacing={2}
+          flexGrow={1}
+          overflow="auto"
+          maxHeight="100%"
+        >
+
+          <Button onClick={transcibeAudioFileText}>Transcribe</Button>
+          <Box>Transcription : {transcription}</Box>
+
+        </Stack>
       </Stack>
     </Box>
   )
