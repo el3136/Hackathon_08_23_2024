@@ -14,22 +14,23 @@ export default function Home() {
     },
   ])
   const [message, setMessage] = useState('')
-
   
   const transcibeAudioFileText = async () => {
     try {
       const response = await fetch('/api/speechtotext', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
   
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
 
-      console.log(response)
+      const result = await response.json().then((data) => {
+        return data.transcription
+      }).catch(error => {
+        // Handle error
+      });
+      console.log(result)
 
     } catch (error) {
       console.error('Error:', error)
